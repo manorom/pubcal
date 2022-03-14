@@ -1,5 +1,5 @@
 use hyper::header::{self, HeaderMap, HeaderValue};
-use hyper::{Request, Response, Uri, Body};
+use hyper::{Body, Request, Response, Uri};
 use std::net::IpAddr;
 
 use crate::config::Calendar;
@@ -40,17 +40,17 @@ pub fn request(
     credential: &str,
 ) -> anyhow::Result<Request<Body>> {
     let uri = calendar.collection_uri(base_url);
-    let mut proxy_req = Request::get(uri)
-        .body(Body::empty())?;
+    let mut proxy_req = Request::get(uri).body(Body::empty())?;
     *proxy_req.headers_mut() = remove_hop_headers(req.headers());
     proxy_req.headers_mut().insert(
         header::AUTHORIZATION,
-        HeaderValue::from_str(&format!("Basic {}", credential))?);
+        HeaderValue::from_str(&format!("Basic {}", credential))?,
+    );
     // TODO: forwarded header must be augmented
-    proxy_req.headers_mut()
+    proxy_req
+        .headers_mut()
         .entry("X-Forwarded-For")
         .or_insert(client_ip.to_string().parse()?);
-    
 
     Ok(proxy_req)
 }

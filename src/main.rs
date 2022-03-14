@@ -13,6 +13,12 @@ use config::Config;
 
 type Client = hyper::Client<hyper::client::HttpConnector>;
 
+async fn shutdown_signal() {
+    tokio::signal::ctrl_c()
+        .await
+        .expect("failed to install CTRL+C signal handler");
+}
+
 async fn handle(
     req: &Request<Body>,
     config: &Config,
@@ -40,7 +46,13 @@ async fn handle(
     )?;
     let response = client.request(proxied_req).await?;
 
-    log::info!("Request: {} {} -> collection {} {}", req.method(), req.uri(), calendar.collection_id, response.status());
+    log::info!(
+        "Request: {} {} -> collection {} {}",
+        req.method(),
+        req.uri(),
+        calendar.collection_id,
+        response.status()
+    );
 
     proxy::response(response)
 }
@@ -85,7 +97,9 @@ async fn main() {
         }
     });
 
-    let server = Server::bind(&bind_addr).serve(make_svc);
+    let server = Server::bind(&bind_addr)
+        .serve(make_svc)
+        .with_graceful_shutdown(shutdown_signal());
 
     log::info!("Starting up server");
     // And run forever...
