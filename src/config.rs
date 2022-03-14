@@ -15,7 +15,13 @@ pub struct Calendar {
 
 impl Calendar {
     pub fn collection_uri(&self, base_url: Uri) -> Uri {
-        let path = format!("{}/{}/", base_url.path(), self.collection_id);
+        // Not the correct path!!
+        let path = format!(
+            "{}{}/{}/",
+            base_url.path(),
+            self.upstream_user,
+            self.collection_id
+        );
         Uri::builder()
             .scheme(base_url.scheme().unwrap().clone())
             .authority(base_url.authority().unwrap().clone())
