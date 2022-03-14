@@ -1,0 +1,15 @@
+[package]
+name = "pubcal"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+anyhow = "1.0.55"
+env_logger = "^0.9.0"
+hyper = { version = "^0.14.17", features = ["server", "client", "http1", "tcp"] }
+log = "^0.4.14"
+serde = { version = "^1.0.136", features = ["derive"] }
+tokio = { version = "^1.17.0", features = ["rt", "macros", "rt-multi-thread"] }
+toml = "^0.5.8"
+uuid = { version = "^0.8.2", features = ["serde", "v4"] }
